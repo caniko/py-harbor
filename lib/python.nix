@@ -276,8 +276,9 @@ rec {
       wrapScript = script: ''
         wrapProgram $out/bin/${script} \
           --prefix PATH : ${nixLib.makeBinPath runtimePathPackages} \
-          --prefix LD_LIBRARY_PATH : ${nixLib.makeLibraryPath runtimeLibraryPackages} \
-          ${wrapEnvFlags}
+          --prefix LD_LIBRARY_PATH : ${nixLib.makeLibraryPath runtimeLibraryPackages}${
+            nixLib.optionalString (wrapEnvFlags != "") " \\\n  ${wrapEnvFlags}"
+          }
       '';
     in
     pkgs.symlinkJoin {
