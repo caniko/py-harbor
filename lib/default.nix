@@ -3,8 +3,8 @@
   pyproject-nix,
   uv2nix,
   pyproject-build-systems,
-}:
-let
+  meta-harbor ? null,
+}: let
   nixLib = nixpkgs.lib;
   pythonLib = import ./python.nix {
     inherit
@@ -15,28 +15,33 @@ let
       ;
   };
 in
-pythonLib
-// rec {
-  allSystems = nixLib.systems.flakeExposed;
-  packageSystems = [
-    "x86_64-linux"
-    "aarch64-darwin"
-  ];
+  pythonLib
+  // rec {
+    opencode =
+      if meta-harbor != null
+      then meta-harbor.lib.opencode
+      else throw "py-harbor: opencode helpers require the meta-harbor flake input";
 
-  forAllSystems = f: nixLib.genAttrs allSystems f;
-  forPackageSystems = f: nixLib.genAttrs packageSystems f;
+    allSystems = nixLib.systems.flakeExposed;
+    packageSystems = [
+      "x86_64-linux"
+      "aarch64-darwin"
+    ];
 
-  mkPkgs =
-    {
+    forAllSystems = f: nixLib.genAttrs allSystems f;
+    forPackageSystems = f: nixLib.genAttrs packageSystems f;
+
+    mkPkgs = {
       system,
-      overlays ? [ ],
-      config ? { },
+      overlays ? [],
+      config ? {},
     }:
-    import nixpkgs {
-      inherit system overlays;
-      config = {
-        allowUnfree = true;
-      }
-      // config;
-    };
-}
+      import nixpkgs {
+        inherit system overlays;
+        config =
+          {
+            allowUnfree = true;
+          }
+          // config;
+      };
+  }

@@ -23,40 +23,44 @@
       inputs.pyproject-nix.follows = "pyproject-nix";
       inputs.uv2nix.follows = "uv2nix";
     };
+
+    meta-harbor = {
+      url = "git+https://codeberg.org/caniko/meta-harbor.git?ref=trunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      pyproject-nix,
-      uv2nix,
-      pyproject-build-systems,
-      ...
-    }:
-    let
-      lib = import ./lib {
-        inherit
-          nixpkgs
-          pyproject-nix
-          uv2nix
-          pyproject-build-systems
-          ;
-      };
-    in
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    pyproject-nix,
+    uv2nix,
+    pyproject-build-systems,
+    meta-harbor,
+    ...
+  }: let
+    lib = import ./lib {
+      inherit
+        nixpkgs
+        pyproject-nix
+        uv2nix
+        pyproject-build-systems
+        meta-harbor
+        ;
+    };
+  in
     {
       inherit lib;
     }
     // flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = lib.mkPkgs { inherit system; };
-      in
-      {
+      system: let
+        pkgs = lib.mkPkgs {inherit system;};
+      in {
         formatter = pkgs.writeShellApplication {
           name = "py-harbor-fmt";
-          runtimeInputs = [ pkgs.nixfmt ];
+          runtimeInputs = [pkgs.nixfmt];
           text = ''
             if [ "$#" -eq 0 ]; then
               find . -name '*.nix' -print0 | xargs -0 nixfmt
