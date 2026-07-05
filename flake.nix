@@ -29,6 +29,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+
+    nix-opencode-lsp = {
+      url = "git+ssh://git@codeberg.org/caniko/nix-opencode-lsp.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   outputs = {
@@ -39,6 +45,7 @@
     uv2nix,
     pyproject-build-systems,
     meta-harbor,
+    nix-opencode-lsp,
     ...
   }: let
     lib = import ./lib {
@@ -49,6 +56,7 @@
         pyproject-build-systems
         meta-harbor
         ;
+      opencodeLspLib = nix-opencode-lsp.lib;
     };
   in
     {
@@ -68,6 +76,14 @@
               exec nixfmt "$@"
             fi
           '';
+        };
+
+        devShells = {
+          opencode-lsp-python = nix-opencode-lsp.lib.mkShell {
+            inherit pkgs;
+            profiles = ["python"];
+          };
+          default = self.devShells.${system}.opencode-lsp-python;
         };
 
         checks = import ./checks {

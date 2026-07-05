@@ -4,6 +4,7 @@
   uv2nix,
   pyproject-build-systems,
   meta-harbor ? null,
+  opencodeLspLib ? null,
 }: let
   nixLib = nixpkgs.lib;
   pythonLib = import ./python.nix {
@@ -12,6 +13,7 @@
       pyproject-nix
       uv2nix
       pyproject-build-systems
+      opencodeLspLib
       ;
   };
 in

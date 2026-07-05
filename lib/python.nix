@@ -3,6 +3,7 @@
   pyproject-nix,
   uv2nix,
   pyproject-build-systems,
+  opencodeLspLib ? null,
 }: let
   defaultTorchCodecMissingDeps = [
     "libavcodec.so.58"
@@ -134,10 +135,15 @@ in rec {
   }: let
     uvFlags = "--extra ${uvExtra} --group ${devGroup}";
     generatedHelpers = map (spec: mkUvHelper ({inherit pkgs;} // spec)) helperSpecs;
-    opencodeLspPackages = nixLib.optionals (opencodeLsp.enable or true) [
-      pkgs.basedpyright
-      pkgs.ruff
-    ];
+    opencodeLspEnabled = opencodeLsp.enable or true;
+    opencodeLspHook =
+      if opencodeLspEnabled && opencodeLspLib != null
+      then
+        (opencodeLspLib.mkShell {
+          inherit pkgs;
+          profiles = ["python"];
+        }).shellHook
+      else "";
     pythonPath =
       if pythonPathEntries == []
       then ""
@@ -158,7 +164,6 @@ in rec {
           pkgs.uv
         ]
         ++ basePackages
-        ++ opencodeLspPackages
         ++ extraPackages
         ++ generatedHelpers
         ++ helperPackages;
@@ -173,6 +178,7 @@ in rec {
 
       shellHook = ''
         ${shellHookPrefix}
+        ${opencodeLspHook}
         ${pythonPath}
         ${syncHook}
         ${shellHookSuffix}
