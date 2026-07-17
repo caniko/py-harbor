@@ -46,6 +46,11 @@ let
     command = "--version";
   };
 
+  validationPython = harbor.mkPythonEnv {
+    inherit pkgs;
+    packages = ps: [ ps.pyyaml ];
+  };
+
   shell = harbor.mkUvDevShell {
     inherit pkgs python;
     uvExtra = "dev";
@@ -76,6 +81,13 @@ in
   uv-dev-shell = pkgs.runCommand "py-harbor-uv-dev-shell" { } ''
     test -e ${shell}
     test -x ${helper}/bin/py-harbor-uv-helper-check
+    mkdir -p $out
+    echo ok > $out/result
+  '';
+
+  python-env = pkgs.runCommand "py-harbor-python-env" { } ''
+    test -x ${validationPython}/bin/python3
+    ${validationPython}/bin/python3 -c 'import yaml; print(yaml.__version__)'
     mkdir -p $out
     echo ok > $out/result
   '';

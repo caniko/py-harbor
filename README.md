@@ -9,6 +9,7 @@ boring Python/Nix plumbing.
 ## API
 
 - `mkPkgs`, `forAllSystems`, `forPackageSystems`
+- `mkPythonEnv`
 - `mkUvHelper`, `mkUvDevShell`, `mkUvDevShells`
 - `mkUvPythonSet`, `mkUvVirtualEnv`, `mkUvCheckEnv`, `mkUvAppPackage`
 - `mkFfmpegCompat`

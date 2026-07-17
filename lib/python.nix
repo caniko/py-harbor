@@ -115,6 +115,13 @@ in rec {
       '';
     };
 
+  mkPythonEnv = {
+    pkgs,
+    python ? pkgs.python313,
+    packages ? (_: []),
+  }:
+    python.withPackages packages;
+
   mkUvDevShell = {
     pkgs,
     python ? pkgs.python313,
