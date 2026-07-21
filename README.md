@@ -10,6 +10,7 @@ boring Python/Nix plumbing.
 
 - `mkPkgs`, `forAllSystems`, `forPackageSystems`
 - `mkPythonEnv`
+- `loadUvWorkspace`, `mkPythonApplicationPackage`
 - `mkUvHelper`, `mkUvDevShell`, `mkUvDevShells`
 - `mkUvPythonSet`, `mkUvVirtualEnv`, `mkUvCheckEnv`, `mkUvAppPackage`
 - `mkFfmpegCompat`

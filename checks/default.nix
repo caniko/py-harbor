@@ -51,6 +51,13 @@ let
     packages = ps: [ ps.pyyaml ];
   };
 
+  validationPackage = harbor.mkPythonApplicationPackage {
+    inherit pkgs;
+    name = "py-harbor-python-app";
+    environment = validationPython;
+    scripts = [ "python3" ];
+  };
+
   shell = harbor.mkUvDevShell {
     inherit pkgs python;
     uvExtra = "dev";
@@ -88,6 +95,9 @@ in
   python-env = pkgs.runCommand "py-harbor-python-env" { } ''
     test -x ${validationPython}/bin/python3
     ${validationPython}/bin/python3 -c 'import yaml; print(yaml.__version__)'
+    test -x ${validationPackage}/bin/python3
+    test -x ${validationPackage.passthru.pythonInterpreter}
+    ${validationPackage.passthru.pythonInterpreter} -c 'import yaml'
     mkdir -p $out
     echo ok > $out/result
   '';
