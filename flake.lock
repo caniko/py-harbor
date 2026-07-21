@@ -58,11 +58,11 @@
         "rev": "0f9b797ed177cdc78d34d085fff9ff7c45a51b2f",
         "revCount": 2,
         "type": "git",
-        "url": "ssh://git@codeberg.org/caniko/nix-opencode-lsp.git"
+        "url": "https://codeberg.org/caniko/nix-opencode-lsp.git"
       },
       "original": {
         "type": "git",
-        "url": "ssh://git@codeberg.org/caniko/nix-opencode-lsp.git"
+        "url": "git+https://codeberg.org/caniko/nix-opencode-lsp.git"
       }
     },
     "nixpkgs": {
