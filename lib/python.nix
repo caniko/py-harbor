@@ -129,7 +129,7 @@ rec {
     {
       pkgs,
       python ? pkgs.python313,
-      uvExtra,
+      uvExtra ? null,
       devGroup ? "dev",
       basePackages ? [ ],
       extraPackages ? [ ],
@@ -147,7 +147,10 @@ rec {
       },
     }:
     let
-      uvFlags = "--extra ${uvExtra} --group ${devGroup}";
+      uvFlags = nixLib.concatStringsSep " " (
+        (nixLib.optional (uvExtra != null) "--extra ${uvExtra}")
+        ++ (nixLib.optional (devGroup != null) "--group ${devGroup}")
+      );
       generatedHelpers = map (spec: mkUvHelper ({ inherit pkgs; } // spec)) helperSpecs;
       opencodeLspEnabled = opencodeLsp.enable or true;
       opencodeLspHook =
@@ -222,9 +225,7 @@ rec {
     };
 
   loadUvWorkspace =
-    {
-      workspaceRoot,
-    }:
+    { workspaceRoot }:
     uv2nix.lib.workspace.loadWorkspace { inherit workspaceRoot; };
 
   mkUvPythonSet =
@@ -260,14 +261,26 @@ rec {
 
   mkUvVirtualEnv =
     {
+      pkgs,
+      python ? pkgs.python313,
       name,
       dependencies,
       ...
     }@args:
     let
       pythonSet = mkUvPythonSet (builtins.removeAttrs args [ "name" ]);
+      environment = pythonSet.mkVirtualEnv name dependencies;
     in
-    pythonSet.mkVirtualEnv name dependencies;
+    environment
+    // {
+      passthru = (environment.passthru or { }) // {
+        pythonEnvironment = environment;
+        pythonInterpreter = "${environment}/bin/python";
+        pythonSitePackages = "${environment}/${python.sitePackages}";
+      };
+    };
+
+  mkUvPackage = mkUvVirtualEnv;
 
   mkUvCheckEnv = mkUvVirtualEnv;
 

@@ -12,12 +12,26 @@ boring Python/Nix plumbing.
 - `mkPythonEnv`
 - `loadUvWorkspace`, `mkPythonApplicationPackage`
 - `mkUvHelper`, `mkUvDevShell`, `mkUvDevShells`
-- `mkUvPythonSet`, `mkUvVirtualEnv`, `mkUvCheckEnv`, `mkUvAppPackage`
+- `mkUvPythonSet`, `mkUvVirtualEnv`, `mkUvPackage`, `mkUvCheckEnv`, `mkUvAppPackage`
 - `mkFfmpegCompat`
 - `mkFfmpegTorchCodecAbiCheck`
 - `pythonOverrides.addSetuptools`
 - `pythonOverrides.addTorchRuntime`
 - `pythonOverrides.addTorchCodecFfmpegRuntime`
+
+`mkUvVirtualEnv` and `mkUvCheckEnv` return immutable uv2nix environments. Use
+their `${env}/bin/python` interpreter rather than manually prepending a
+`site-packages` path. They expose the same locations as passthroughs:
+`pythonEnvironment`, `pythonInterpreter`, and `pythonSitePackages`.
+
+`mkUvDevShell` `extraPackages` are Nix shell tools; they do not add Python
+dependencies to the uv environment. Put Python dependencies in `pyproject.toml`
+and `uv.lock`, or replace them through the pyproject-nix overlay. Keep one
+provider for a given Python package instead of mixing Nix and uv copies through
+`PYTHONPATH`.
+
+Nix checks run against read-only source trees. Tool caches and reports must be
+placed under `$TMPDIR` or `$out`, not in the source tree.
 
 ## Minimal Usage
 

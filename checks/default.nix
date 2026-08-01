@@ -40,6 +40,22 @@ let
     };
   };
 
+  genericPackage = harbor.mkUvPackage {
+    inherit pkgs python;
+    name = "minimal-package";
+    workspaceRoot = fixture;
+    dependencies = {
+      minimal = [ ];
+    };
+    pyprojectOverrides = final: prev: {
+      minimal = prev.minimal.overrideAttrs (old: {
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+          final.hatchling
+        ];
+      });
+    };
+  };
+
   helper = harbor.mkUvHelper {
     inherit pkgs;
     name = "py-harbor-uv-helper-check";
@@ -65,6 +81,13 @@ let
     autoSync = false;
   };
 
+  shellWithoutSelections = harbor.mkUvDevShell {
+    inherit pkgs python;
+    uvExtra = null;
+    devGroup = null;
+    autoSync = false;
+  };
+
   ffmpegAbiCheck = harbor.mkFfmpegTorchCodecAbiCheck {
     inherit pkgs ffmpeg;
     name = "py-harbor-ffmpeg-torchcodec-abi-check";
@@ -81,6 +104,10 @@ in
     test -e ${pythonSet.minimal}
     test -x ${minimalEnv}/bin/python
     ${minimalEnv}/bin/python -c 'import minimal; print(minimal.VALUE)'
+    test -x ${minimalEnv.passthru.pythonInterpreter}
+    test -d ${minimalEnv.passthru.pythonSitePackages}
+    test -x ${genericPackage}/bin/python
+    ${genericPackage}/bin/python -c 'import minimal; print(minimal.VALUE)'
     mkdir -p $out
     echo ok > $out/result
   '';
@@ -88,6 +115,7 @@ in
   uv-dev-shell = pkgs.runCommand "py-harbor-uv-dev-shell" { } ''
     test -e ${shell}
     test -x ${helper}/bin/py-harbor-uv-helper-check
+    test -e ${shellWithoutSelections}
     mkdir -p $out
     echo ok > $out/result
   '';
