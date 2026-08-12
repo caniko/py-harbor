@@ -52,17 +52,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1783251302,
-        "narHash": "sha256-F0ij0ZsjrPpqPJc02zv15ZkEbU97XBE/SWrZ9LN8JZE=",
-        "ref": "refs/heads/trunk",
-        "rev": "0f9b797ed177cdc78d34d085fff9ff7c45a51b2f",
-        "revCount": 2,
-        "type": "git",
-        "url": "https://codeberg.org/caniko/nix-opencode-lsp.git"
+        "lastModified": 1785298780,
+        "narHash": "sha256-hq+/QcdG+pOKugcglqt92n3AwDbZnJB/Z+FCgmM3nwg=",
+        "owner": "caniko",
+        "repo": "nix-opencode-lsp",
+        "rev": "38e7ce16c754947a257a00a77682adfe696b6718",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "git+https://codeberg.org/caniko/nix-opencode-lsp.git"
+        "owner": "caniko",
+        "ref": "trunk",
+        "repo": "nix-opencode-lsp",
+        "type": "github"
       }
     },
     "nixpkgs": {
