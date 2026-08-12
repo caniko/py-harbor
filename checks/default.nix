@@ -86,6 +86,9 @@ let
     uvExtra = null;
     devGroup = null;
     autoSync = false;
+    opencodeLsp = {
+      enable = false;
+    };
   };
 
   ffmpegAbiCheck = harbor.mkFfmpegTorchCodecAbiCheck {
@@ -116,6 +119,8 @@ in
     test -e ${shell}
     test -x ${helper}/bin/py-harbor-uv-helper-check
     test -e ${shellWithoutSelections}
+    test "${builtins.toJSON (pkgs.lib.hasInfix "--extra" shellWithoutSelections.shellHook)}" = "false"
+    test "${builtins.toJSON (pkgs.lib.hasInfix "--group" shellWithoutSelections.shellHook)}" = "false"
     mkdir -p $out
     echo ok > $out/result
   '';
