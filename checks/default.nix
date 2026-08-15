@@ -86,6 +86,9 @@ let
     uvExtra = null;
     devGroup = null;
     autoSync = false;
+    opencodeLsp = {
+      enable = false;
+    };
   };
 
   ffmpegAbiCheck = harbor.mkFfmpegTorchCodecAbiCheck {
