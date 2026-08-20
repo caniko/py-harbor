@@ -34,14 +34,14 @@ Nix checks run against read-only source trees. Tool caches and reports must be
 placed under `$TMPDIR` or `$out`, not in the source tree.
 
 ```bash
-nix flake init -t git+https://codeberg.org/caniko/py-harbor.git
+nix flake init -t github:caniko/py-harbor
 ```
 
 ## Minimal Usage
 
 ```nix
 {
-  inputs.py-harbor.url = "git+https://codeberg.org/caniko/py-harbor.git";
+  inputs.py-harbor.url = "github:caniko/py-harbor";
 
   outputs = { self, nixpkgs, py-harbor, ... }:
     let

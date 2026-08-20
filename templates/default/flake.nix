@@ -2,7 +2,7 @@
   description = "Python uv project — powered by py-harbor";
 
   inputs = {
-    py-harbor.url = "git+https://codeberg.org/caniko/py-harbor.git?ref=trunk";
+    py-harbor.url = "github:caniko/py-harbor";
     nixpkgs.follows = "py-harbor/nixpkgs";
     treefmt-nix.follows = "py-harbor/treefmt-nix";
     git-hooks.follows = "py-harbor/git-hooks";
