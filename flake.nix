@@ -30,7 +30,7 @@
     };
 
     nix-opencode-lsp = {
-      url = "git+ssh://git@github.com/caniko/nix-opencode-lsp.git?ref=trunk";
+      url = "git+https://github.com/caniko/nix-opencode-lsp.git?ref=trunk";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
