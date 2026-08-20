@@ -34,6 +34,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -45,6 +54,8 @@
     pyproject-build-systems,
     meta-harbor,
     nix-opencode-lsp,
+    treefmt-nix,
+    git-hooks,
     ...
   }: let
     lib = import ./lib {
@@ -91,7 +102,7 @@
         };
 
         checks = import ./checks {
-          inherit self pkgs system nixpkgs;
+          inherit self pkgs system nixpkgs treefmt-nix git-hooks;
           harbor = lib;
           meta = meta-harbor.lib;
         };
