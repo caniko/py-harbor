@@ -3,10 +3,18 @@
   harbor,
   pkgs,
   system,
+  nixpkgs,
+  treefmt-nix,
+  git-hooks,
+  meta,
 }:
 let
   python = pkgs.python313;
-  fixture = ../fixtures/minimal;
+  fixture = ../templates/default;
+  templateFlake = builtins.readFile (fixture + "/flake.nix");
+  templateSimit = builtins.fromTOML (builtins.readFile (fixture + "/simit.toml"));
+  templateTreefmt = builtins.readFile (fixture + "/nix/treefmt.nix");
+  templateHooks = builtins.readFile (fixture + "/nix/pre-commit.nix");
   ffmpeg = harbor.mkFfmpegCompat { inherit pkgs; };
 
   pythonSet = harbor.mkUvPythonSet {
@@ -96,6 +104,24 @@ let
     name = "py-harbor-ffmpeg-torchcodec-abi-check";
   };
 in
+assert
+  templateSimit.flake == {
+    scope = "full";
+    mode = "custom";
+    backend = "py-harbor";
+    components = [
+      "treefmt"
+      "nix-flake-check"
+    ];
+  };
+assert pkgs.lib.hasInfix "treefmt-nix.follows" templateFlake;
+assert pkgs.lib.hasInfix "git-hooks.follows" templateFlake;
+assert pkgs.lib.hasInfix "treefmtEval.config.build.check self" templateFlake;
+assert pkgs.lib.hasInfix "pre-commit-check.shellHook" templateFlake;
+assert pkgs.lib.hasInfix "programs.alejandra.enable = true" templateTreefmt;
+assert pkgs.lib.hasInfix "programs.taplo.enable = true" templateTreefmt;
+assert pkgs.lib.hasInfix "treefmt =" templateHooks;
+assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
 {
   exports-lib = pkgs.runCommand "py-harbor-exports-lib" { } ''
     test "${toString (builtins.elem "x86_64-linux" self.lib.packageSystems)}" = "1"
@@ -119,11 +145,41 @@ in
     test -e ${shell}
     test -x ${helper}/bin/py-harbor-uv-helper-check
     test -e ${shellWithoutSelections}
-    test "${builtins.toJSON (pkgs.lib.hasInfix "--extra" shellWithoutSelections.shellHook)}" = "false"
-    test "${builtins.toJSON (pkgs.lib.hasInfix "--group" shellWithoutSelections.shellHook)}" = "false"
+    test "${builtins.toJSON (pkgs.lib.hasInfix "--extra" shellWithoutSelections.passthru.devShellSpec.shellHook)}" = "false"
+    test "${builtins.toJSON (pkgs.lib.hasInfix "--group" shellWithoutSelections.passthru.devShellSpec.shellHook)}" = "false"
     mkdir -p $out
     echo ok > $out/result
   '';
+
+  template-default = meta.templateTests.mkCheck {
+    inherit pkgs system;
+    flakeNix = ../templates/default/flake.nix;
+    inputs = {
+      inherit nixpkgs treefmt-nix git-hooks;
+      py-harbor = self;
+    };
+    requiredFiles = [
+      "flake.nix"
+      "pyproject.toml"
+      "uv.lock"
+      "src/minimal/__init__.py"
+      "simit.toml"
+      "nix/treefmt.nix"
+      "nix/pre-commit.nix"
+    ];
+    requiredInputs = [
+      "py-harbor"
+      "treefmt-nix"
+      "git-hooks"
+    ];
+    commands = [
+      "uv"
+      "python"
+    ];
+    env.UV_PYTHON_DOWNLOADS = "never";
+    hookContains = [ "uv sync" ];
+    inherit (meta) devShellTests;
+  };
 
   python-env = pkgs.runCommand "py-harbor-python-env" { } ''
     test -x ${validationPython}/bin/python3

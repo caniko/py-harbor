@@ -15,6 +15,10 @@
       pyproject-build-systems
       opencodeLspLib
       ;
+    metaDevShell =
+      if meta-harbor != null
+      then meta-harbor.lib.devShell
+      else null;
   };
 in
   pythonLib

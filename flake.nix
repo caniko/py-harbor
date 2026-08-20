@@ -25,15 +25,23 @@
     };
 
     meta-harbor = {
-      url = "git+https://codeberg.org/caniko/meta-harbor.git?ref=trunk";
+      url = "git+https://github.com/caniko/meta-harbor.git?ref=trunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-opencode-lsp = {
+      url = "git+https://github.com/caniko/nix-opencode-lsp.git?ref=trunk";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    nix-opencode-lsp = {
-      url = "git+ssh://git@github.com/caniko/nix-opencode-lsp.git?ref=trunk";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
+    };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -46,6 +54,8 @@
     pyproject-build-systems,
     meta-harbor,
     nix-opencode-lsp,
+    treefmt-nix,
+    git-hooks,
     ...
   }: let
     lib = import ./lib {
@@ -60,8 +70,13 @@
     };
   in
     {
-      inherit lib;
-    }
+        inherit lib;
+
+        templates.default = {
+          path = ./templates/default;
+          description = "Python uv project with py-harbor";
+        };
+      }
     // flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = lib.mkPkgs {inherit system;};
@@ -87,8 +102,9 @@
         };
 
         checks = import ./checks {
-          inherit self pkgs system;
+          inherit self pkgs system nixpkgs treefmt-nix git-hooks;
           harbor = lib;
+          meta = meta-harbor.lib;
         };
       }
     );

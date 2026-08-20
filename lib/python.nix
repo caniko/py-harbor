@@ -4,6 +4,7 @@
   uv2nix,
   pyproject-build-systems,
   opencodeLspLib ? null,
+  metaDevShell ? null,
 }:
 let
   defaultTorchCodecMissingDeps = [
@@ -175,31 +176,33 @@ rec {
         . .venv/bin/activate
       '';
     in
-    pkgs.mkShell {
-      packages = [
-        python
-        pkgs.uv
-      ]
-      ++ basePackages
-      ++ extraPackages
-      ++ generatedHelpers
-      ++ helperPackages;
-
-      env = {
-        LD_LIBRARY_PATH = nixLib.makeLibraryPath (baseLibs ++ extraLibs);
-        UV_LINK_MODE = "copy";
-        UV_PYTHON_DOWNLOADS = "never";
-      }
-      // extraEnv;
-
-      shellHook = ''
-        ${shellHookPrefix}
-        ${opencodeLspHook}
-        ${pythonPath}
-        ${syncHook}
-        ${shellHookSuffix}
-      '';
-    };
+    if metaDevShell == null then
+      throw "py-harbor: mkUvDevShell requires the meta-harbor flake input"
+    else
+      metaDevShell.mkShell {
+        inherit pkgs;
+        packages = [
+          python
+          pkgs.uv
+        ]
+        ++ basePackages
+        ++ extraPackages
+        ++ generatedHelpers
+        ++ helperPackages;
+        env = {
+          LD_LIBRARY_PATH = nixLib.makeLibraryPath (baseLibs ++ extraLibs);
+          UV_LINK_MODE = "copy";
+          UV_PYTHON_DOWNLOADS = "never";
+        }
+        // extraEnv;
+        extraShellHook = ''
+          ${shellHookPrefix}
+          ${opencodeLspHook}
+          ${pythonPath}
+          ${syncHook}
+          ${shellHookSuffix}
+        '';
+      };
 
   mkUvDevShells =
     {
