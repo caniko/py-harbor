@@ -27,7 +27,6 @@
     meta-harbor = {
       url = "git+https://github.com/caniko/meta-harbor.git?ref=trunk";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
 
     nix-opencode-lsp = {
@@ -60,8 +59,13 @@
     };
   in
     {
-      inherit lib;
-    }
+        inherit lib;
+
+        templates.default = {
+          path = ./templates/default;
+          description = "Python uv project with py-harbor";
+        };
+      }
     // flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = lib.mkPkgs {inherit system;};
@@ -87,8 +91,9 @@
         };
 
         checks = import ./checks {
-          inherit self pkgs system;
+          inherit self pkgs system nixpkgs;
           harbor = lib;
+          meta = meta-harbor.lib;
         };
       }
     );

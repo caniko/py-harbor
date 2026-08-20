@@ -33,6 +33,10 @@ provider for a given Python package instead of mixing Nix and uv copies through
 Nix checks run against read-only source trees. Tool caches and reports must be
 placed under `$TMPDIR` or `$out`, not in the source tree.
 
+```bash
+nix flake init -t git+https://codeberg.org/caniko/py-harbor.git
+```
+
 ## Minimal Usage
 
 ```nix
