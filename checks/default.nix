@@ -66,7 +66,7 @@ let
 
   helper = harbor.mkUvHelper {
     inherit pkgs;
-    name = "py-harbor-uv-helper-check";
+    name = "harbor-py-uv-helper-check";
     command = "--version";
   };
 
@@ -77,7 +77,7 @@ let
 
   validationPackage = harbor.mkPythonApplicationPackage {
     inherit pkgs;
-    name = "py-harbor-python-app";
+    name = "harbor-py-python-app";
     environment = validationPython;
     scripts = [ "python3" ];
   };
@@ -101,14 +101,14 @@ let
 
   ffmpegAbiCheck = harbor.mkFfmpegTorchCodecAbiCheck {
     inherit pkgs ffmpeg;
-    name = "py-harbor-ffmpeg-torchcodec-abi-check";
+    name = "harbor-py-ffmpeg-torchcodec-abi-check";
   };
 in
 assert
   templateSimit.flake == {
     scope = "full";
     mode = "custom";
-    backend = "py-harbor";
+    backend = "harbor-py";
     components = [
       "treefmt"
       "nix-flake-check"
@@ -123,13 +123,13 @@ assert pkgs.lib.hasInfix "programs.taplo.enable = true" templateTreefmt;
 assert pkgs.lib.hasInfix "treefmt =" templateHooks;
 assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
 {
-  exports-lib = pkgs.runCommand "py-harbor-exports-lib" { } ''
+  exports-lib = pkgs.runCommand "harbor-py-exports-lib" { } ''
     test "${toString (builtins.elem "x86_64-linux" self.lib.packageSystems)}" = "1"
     mkdir -p $out
     echo ok > $out/result
   '';
 
-  uv-python-set = pkgs.runCommand "py-harbor-uv-python-set" { } ''
+  uv-python-set = pkgs.runCommand "harbor-py-uv-python-set" { } ''
     test -e ${pythonSet.minimal}
     test -x ${minimalEnv}/bin/python
     ${minimalEnv}/bin/python -c 'import minimal; print(minimal.VALUE)'
@@ -141,9 +141,9 @@ assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
     echo ok > $out/result
   '';
 
-  uv-dev-shell = pkgs.runCommand "py-harbor-uv-dev-shell" { } ''
+  uv-dev-shell = pkgs.runCommand "harbor-py-uv-dev-shell" { } ''
     test -e ${shell}
-    test -x ${helper}/bin/py-harbor-uv-helper-check
+    test -x ${helper}/bin/harbor-py-uv-helper-check
     test -e ${shellWithoutSelections}
     test "${builtins.toJSON (pkgs.lib.hasInfix "--extra" shellWithoutSelections.passthru.devShellSpec.shellHook)}" = "false"
     test "${builtins.toJSON (pkgs.lib.hasInfix "--group" shellWithoutSelections.passthru.devShellSpec.shellHook)}" = "false"
@@ -156,7 +156,7 @@ assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
     flakeNix = ../templates/default/flake.nix;
     inputs = {
       inherit nixpkgs treefmt-nix git-hooks;
-      py-harbor = self;
+      harbor-py = self;
     };
     requiredFiles = [
       "flake.nix"
@@ -168,7 +168,7 @@ assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
       "nix/pre-commit.nix"
     ];
     requiredInputs = [
-      "py-harbor"
+      "harbor-py"
       "treefmt-nix"
       "git-hooks"
     ];
@@ -181,7 +181,7 @@ assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
     inherit (meta) devShellTests;
   };
 
-  python-env = pkgs.runCommand "py-harbor-python-env" { } ''
+  python-env = pkgs.runCommand "harbor-py-python-env" { } ''
     test -x ${validationPython}/bin/python3
     ${validationPython}/bin/python3 -c 'import yaml; print(yaml.__version__)'
     test -x ${validationPackage}/bin/python3
@@ -191,7 +191,7 @@ assert pkgs.lib.hasInfix "nix-flake-check" templateHooks;
     echo ok > $out/result
   '';
 
-  ml-helpers = pkgs.runCommand "py-harbor-ml-helpers" { } ''
+  ml-helpers = pkgs.runCommand "harbor-py-ml-helpers" { } ''
     test -x ${ffmpeg}/bin/ffmpeg
     test -e ${ffmpegAbiCheck}/result
     mkdir -p $out

@@ -1,9 +1,9 @@
-# py-harbor
+# harbor-py
 
 Reusable Python `uv2nix` and `pyproject-nix` infrastructure for Nix flakes.
 
-`py-harbor` exposes a small `lib.*` API, following the same consumption style as
-`rs-harbor`: downstream flakes keep project policy local while sharing the
+`harbor-py` exposes a small `lib.*` API, following the same consumption style as
+`harbor-rs`: downstream flakes keep project policy local while sharing the
 boring Python/Nix plumbing.
 
 ## API
@@ -34,18 +34,18 @@ Nix checks run against read-only source trees. Tool caches and reports must be
 placed under `$TMPDIR` or `$out`, not in the source tree.
 
 ```bash
-nix flake init -t github:caniko/py-harbor
+nix flake init -t github:caniko/harbor-py
 ```
 
 ## Minimal Usage
 
 ```nix
 {
-  inputs.py-harbor.url = "github:caniko/py-harbor";
+  inputs.harbor-py.url = "github:caniko/harbor-py";
 
-  outputs = { self, nixpkgs, py-harbor, ... }:
+  outputs = { self, nixpkgs, harbor-py, ... }:
     let
-      py = py-harbor.lib;
+      py = harbor-py.lib;
     in {
       devShells = py.forAllSystems (system:
         let

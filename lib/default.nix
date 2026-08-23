@@ -3,7 +3,7 @@
   pyproject-nix,
   uv2nix,
   pyproject-build-systems,
-  meta-harbor ? null,
+  harbor-meta ? null,
   opencodeLspLib ? null,
 }: let
   nixLib = nixpkgs.lib;
@@ -16,17 +16,17 @@
       opencodeLspLib
       ;
     metaDevShell =
-      if meta-harbor != null
-      then meta-harbor.lib.devShell
+      if harbor-meta != null
+      then harbor-meta.lib.devShell
       else null;
   };
 in
   pythonLib
   // rec {
     opencode =
-      if meta-harbor != null
-      then meta-harbor.lib.opencode
-      else throw "py-harbor: opencode helpers require the meta-harbor flake input";
+      if harbor-meta != null
+      then harbor-meta.lib.opencode
+      else throw "harbor-py: opencode helpers require the harbor-meta flake input";
 
     allSystems = nixLib.systems.flakeExposed;
     packageSystems = [

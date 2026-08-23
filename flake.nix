@@ -24,10 +24,11 @@
       inputs.uv2nix.follows = "uv2nix";
     };
 
-    meta-harbor = {
-      url = "git+https://github.com/caniko/meta-harbor.git?ref=trunk";
+    harbor-meta = {
+      url = "git+https://github.com/caniko/harbor-meta.git?ref=trunk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    meta-harbor.follows = "harbor-meta";
 
     nix-opencode-lsp = {
       url = "git+https://github.com/caniko/nix-opencode-lsp.git?ref=trunk";
@@ -52,7 +53,7 @@
     pyproject-nix,
     uv2nix,
     pyproject-build-systems,
-    meta-harbor,
+    harbor-meta,
     nix-opencode-lsp,
     treefmt-nix,
     git-hooks,
@@ -64,7 +65,7 @@
         pyproject-nix
         uv2nix
         pyproject-build-systems
-        meta-harbor
+        harbor-meta
         ;
       opencodeLspLib = nix-opencode-lsp.lib;
     };
@@ -74,7 +75,7 @@
 
         templates.default = {
           path = ./templates/default;
-          description = "Python uv project with py-harbor";
+          description = "Python uv project with harbor-py";
         };
       }
     // flake-utils.lib.eachDefaultSystem (
@@ -82,7 +83,7 @@
         pkgs = lib.mkPkgs {inherit system;};
       in {
         formatter = pkgs.writeShellApplication {
-          name = "py-harbor-fmt";
+          name = "harbor-py-fmt";
           runtimeInputs = [pkgs.nixfmt];
           text = ''
             if [ "$#" -eq 0 ]; then
@@ -104,7 +105,7 @@
         checks = import ./checks {
           inherit self pkgs system nixpkgs treefmt-nix git-hooks;
           harbor = lib;
-          meta = meta-harbor.lib;
+          meta = harbor-meta.lib;
         };
       }
     );

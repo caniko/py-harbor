@@ -177,7 +177,7 @@ rec {
       '';
     in
     if metaDevShell == null then
-      throw "py-harbor: mkUvDevShell requires the meta-harbor flake input"
+      throw "harbor-py: mkUvDevShell requires the harbor-meta flake input"
     else
       metaDevShell.mkShell {
         inherit pkgs;

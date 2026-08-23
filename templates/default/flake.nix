@@ -1,23 +1,23 @@
 {
-  description = "Python uv project — powered by py-harbor";
+  description = "Python uv project — powered by harbor-py";
 
   inputs = {
-    py-harbor.url = "github:caniko/py-harbor";
-    nixpkgs.follows = "py-harbor/nixpkgs";
-    treefmt-nix.follows = "py-harbor/treefmt-nix";
-    git-hooks.follows = "py-harbor/git-hooks";
+    harbor-py.url = "github:caniko/harbor-py";
+    nixpkgs.follows = "harbor-py/nixpkgs";
+    treefmt-nix.follows = "harbor-py/treefmt-nix";
+    git-hooks.follows = "harbor-py/git-hooks";
   };
 
   outputs =
     {
       self,
       nixpkgs,
-      py-harbor,
+      harbor-py,
       treefmt-nix,
       git-hooks,
     }:
     let
-      py = py-harbor.lib;
+      py = harbor-py.lib;
       forSystem =
         system:
         let

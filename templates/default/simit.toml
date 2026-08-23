@@ -1,5 +1,5 @@
 [flake]
 scope = "full"
 mode = "custom"
-backend = "py-harbor"
+backend = "harbor-py"
 components = ["treefmt", "nix-flake-check"]
